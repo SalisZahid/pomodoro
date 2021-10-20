@@ -1,7 +1,51 @@
-import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Vibration,
+  Alert,
+} from 'react-native';
+import {StackActions} from '@react-navigation/native';
 
-const BreakScreen = () => {
+const BreakScreen = props => {
+  const defaultMinutes = 4;
+  const defaultSeconds = 59;
+  const [seconds, setSeconds] = useState(defaultSeconds);
+  const [minutes, setMinutes] = useState(defaultMinutes);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds(seconds => (seconds > 0 ? seconds - 1 : 59));
+      // console.log(seconds);
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    seconds == 0 ? setMinutes(minutes - 1) : null;
+  }, [seconds]);
+
+  useEffect(() => {
+    if (minutes == 0) {
+      Vibration.vibrate();
+      Alert.alert('Break Time is up', 'Back to Work??', [
+        {
+          text: "Let's Go",
+          onPress: () => props.navigation.dispatch(StackActions.pop(1)),
+        },
+      ]);
+      handleStop();
+    }
+  }, [minutes]);
+
+  const handleStop = () => {
+    setTimeout(() => Vibration.cancel(), 2000);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.emptySpace}>
@@ -10,33 +54,37 @@ const BreakScreen = () => {
       <View style={styles.timeContainerOuter}>
         <View style={styles.timeContainer}>
           <View style={styles.timeInner}>
-            <Text style={styles.minText}>04</Text>
+            <Text style={styles.minText}>
+              {minutes.toString().length < 2 ? `0${minutes}` : minutes}
+            </Text>
             <View>
               <View style={styles.secInner}>
-                <Text style={styles.secText}>59</Text>
+                <Text style={styles.secText}>
+                  {seconds.toString().length < 2 ? `0${seconds}` : seconds}
+                </Text>
               </View>
             </View>
           </View>
         </View>
         <View>
           <View style={styles.configButton}>
-            <TouchableOpacity>
-              <Text style={styles.configText}>Configure time</Text>
-            </TouchableOpacity>
+            {/* <TouchableOpacity>
+              <Text style={styles.configText}>Configure time {'>'} </Text>
+            </TouchableOpacity> */}
           </View>
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.startButton}>
+        {/* <TouchableOpacity style={styles.startButton}>
           <View style={styles.btnInner}>
             <Text style={styles.btnText}>Start</Text>
           </View>
-        </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.stopButton}>
-          <View style={styles.btnInner}>
-            <Text style={styles.btnText}>Stop</Text>
-          </View>
         </TouchableOpacity> */}
+        <TouchableOpacity style={styles.stopButton} onPress={handleStop}>
+          <View style={styles.btnInner}>
+            <Text style={styles.btnText}>Skip</Text>
+          </View>
+        </TouchableOpacity>
       </View>
     </View>
   );

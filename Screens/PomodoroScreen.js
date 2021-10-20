@@ -1,7 +1,73 @@
-import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  Vibration,
+  Alert,
+} from 'react-native';
 
-const PomodoroScreen = () => {
+const PomodoroScreen = props => {
+  const defaultMinutes = 24;
+  const defaultSeconds = 59;
+
+  const [seconds, setSeconds] = useState(defaultSeconds);
+  const [minutes, setMinutes] = useState(defaultMinutes);
+  const [btnSelect, setBtnSelect] = useState(true);
+  const [start, setStart] = useState(false);
+
+  useEffect(() => {
+    let interval;
+    if (start) {
+      interval = setInterval(() => {
+        setSeconds(seconds => (seconds > 0 ? seconds - 1 : 59));
+        // console.log(seconds);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+      setMinutes(defaultMinutes);
+      setSeconds(defaultSeconds);
+    }
+    return () => {
+      setMinutes(defaultMinutes);
+      setSeconds(defaultSeconds);
+      clearInterval(interval);
+    };
+  }, [start]);
+
+  useEffect(() => {
+    seconds == 0 ? setMinutes(minutes - 1) : null;
+  }, [seconds]);
+
+  useEffect(() => {
+    if (minutes == 0) {
+      Vibration.vibrate();
+      Alert.alert('Break Time', 'Take a break', [
+        {
+          text: "Let's Go",
+          onPress: () => props.navigation.navigate('Break'),
+          style: 'default',
+        },
+      ]);
+      handleStop();
+    }
+    // minutes == 0 ? alert('oo') : null;
+    setMinutes(defaultMinutes);
+    setSeconds(defaultSeconds);
+  }, [minutes]);
+
+  const handleStart = () => {
+    setBtnSelect(false);
+    setStart(true);
+  };
+
+  const handleStop = () => {
+    setBtnSelect(true);
+    setStart(false);
+    setTimeout(() => Vibration.cancel(), 2000);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.emptySpace}>
@@ -10,10 +76,14 @@ const PomodoroScreen = () => {
       <View style={styles.timeContainerOuter}>
         <View style={styles.timeContainer}>
           <View style={styles.timeInner}>
-            <Text style={styles.minText}>24</Text>
+            <Text style={styles.minText}>
+              {minutes.toString().length < 2 ? `0${minutes}` : minutes}
+            </Text>
             <View>
               <View style={styles.secInner}>
-                <Text style={styles.secText}>00</Text>
+                <Text style={styles.secText}>
+                  {seconds.toString().length < 2 ? `0${seconds}` : seconds}
+                </Text>
               </View>
             </View>
           </View>
@@ -21,22 +91,25 @@ const PomodoroScreen = () => {
         <View>
           <View style={styles.configButton}>
             <TouchableOpacity>
-              <Text style={styles.configText}>Configure time</Text>
+              {/* <Text style={styles.configText}>Configure time</Text> */}
             </TouchableOpacity>
           </View>
         </View>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.startButton}>
-          <View style={styles.btnInner}>
-            <Text style={styles.btnText}>Start</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.stopButton}>
-          <View style={styles.btnInner}>
-            <Text style={styles.btnText}>Stop</Text>
-          </View>
-        </TouchableOpacity>
+        {btnSelect ? (
+          <TouchableOpacity style={styles.startButton} onPress={handleStart}>
+            <View style={styles.btnInner}>
+              <Text style={styles.btnText}>Start</Text>
+            </View>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.stopButton} onPress={handleStop}>
+            <View style={styles.btnInner}>
+              <Text style={styles.btnText}>Stop</Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
