@@ -10,10 +10,11 @@ import {
 import {StackActions} from '@react-navigation/native';
 
 const BreakScreen = props => {
-  const defaultMinutes = 4;
-  const defaultSeconds = 59;
+  const defaultMinutes = 1;
+  const defaultSeconds = 3;
   const [seconds, setSeconds] = useState(defaultSeconds);
   const [minutes, setMinutes] = useState(defaultMinutes);
+  const [start, setStart] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -80,7 +81,9 @@ const BreakScreen = props => {
             <Text style={styles.btnText}>Start</Text>
           </View>
         </TouchableOpacity> */}
-        <TouchableOpacity style={styles.stopButton} onPress={handleStop}>
+        <TouchableOpacity
+          style={styles.stopButton}
+          onPress={() => props.navigation.dispatch(StackActions.pop(1))}>
           <View style={styles.btnInner}>
             <Text style={styles.btnText}>Skip</Text>
           </View>

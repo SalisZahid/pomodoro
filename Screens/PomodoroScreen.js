@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 
 const PomodoroScreen = props => {
-  const defaultMinutes = 24;
-  const defaultSeconds = 59;
+  let defaultMinutes = 1;
+  let defaultSeconds = 3;
 
   const [seconds, setSeconds] = useState(defaultSeconds);
   const [minutes, setMinutes] = useState(defaultMinutes);
@@ -21,8 +21,7 @@ const PomodoroScreen = props => {
     let interval;
     if (start) {
       interval = setInterval(() => {
-        setSeconds(seconds => (seconds > 0 ? seconds - 1 : 59));
-        // console.log(seconds);
+        setSeconds(seconds => (seconds > 0 ? seconds - 1 : defaultSeconds));
       }, 1000);
     } else {
       clearInterval(interval);
@@ -37,7 +36,9 @@ const PomodoroScreen = props => {
   }, [start]);
 
   useEffect(() => {
-    seconds == 0 ? setMinutes(minutes - 1) : null;
+    if (seconds == 0) {
+      setMinutes(minutes - 1);
+    }
   }, [seconds]);
 
   useEffect(() => {
@@ -47,13 +48,10 @@ const PomodoroScreen = props => {
         {
           text: "Let's Go",
           onPress: () => props.navigation.navigate('Break'),
-          style: 'default',
         },
       ]);
       handleStop();
     }
-    // minutes == 0 ? alert('oo') : null;
-    setMinutes(defaultMinutes);
     setSeconds(defaultSeconds);
   }, [minutes]);
 
