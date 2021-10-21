@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 
 const PomodoroScreen = props => {
-  let defaultMinutes = 1;
-  let defaultSeconds = 3;
+  let defaultMinutes = 24;
+  let defaultSeconds = 59;
 
   const [seconds, setSeconds] = useState(defaultSeconds);
   const [minutes, setMinutes] = useState(defaultMinutes);

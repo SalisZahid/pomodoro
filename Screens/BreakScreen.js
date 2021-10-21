@@ -10,8 +10,8 @@ import {
 import {StackActions} from '@react-navigation/native';
 
 const BreakScreen = props => {
-  const defaultMinutes = 1;
-  const defaultSeconds = 3;
+  const defaultMinutes = 4;
+  const defaultSeconds = 59;
   const [seconds, setSeconds] = useState(defaultSeconds);
   const [minutes, setMinutes] = useState(defaultMinutes);
   const [start, setStart] = useState(false);
